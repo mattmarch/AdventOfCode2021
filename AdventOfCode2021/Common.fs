@@ -11,4 +11,4 @@ let splitBy (separator: string) (inputString: string): string list =
 let unpack2 l =
     match l with
     | [a; b] -> a, b
-    | _ -> failwithf "Tried to unpack2 list without exactly 2 elements: %A" l
+    | _ -> failwithf $"Tried to unpack2 list without exactly 2 elements: %A{l}"

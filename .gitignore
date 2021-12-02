@@ -3,5 +3,6 @@
 
 .ionide
 .vscode
+.idea
 
 scratch.fsx

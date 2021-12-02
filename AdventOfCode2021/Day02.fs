@@ -12,7 +12,7 @@ let parseLine line =
                     | "up" -> Up
                     | "down" -> Down
                     | "forward" -> Forward
-                    | unrecognised -> failwithf "Unrecognised direction %s" unrecognised
+                    | unrecognised -> failwithf $"Unrecognised direction %s{unrecognised}"
     (direction, int distanceString)
 
 let updatePosition (x, y) (direction, distance) =
