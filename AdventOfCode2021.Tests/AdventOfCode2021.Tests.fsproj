@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Day01Tests.fs" />
+    <Compile Include="Day02Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -24,10 +25,6 @@
     <ProjectReference Include="..\AdventOfCode2021\AdventOfCode2021.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <None
-      Include="TestInputs\**"
-      CopyToOutputDirectory="PreserveNewest"
-      LinkBase="TestInputs\**"
-    />
+    <None Include="TestInputs\**" CopyToOutputDirectory="PreserveNewest" LinkBase="TestInputs\**" />
   </ItemGroup>
 </Project>
