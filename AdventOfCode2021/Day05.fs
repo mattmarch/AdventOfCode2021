@@ -62,6 +62,12 @@ let markVentsOnField points =
     let emptyField: Field = Map.ofList []
     points |> List.fold markVentOnField emptyField
 
+let countOverlappingVents (field: Field) =
+    field
+    |> Map.values
+    |> Seq.filter (fun v -> v > 1)
+    |> Seq.length
+
 let solveA input =
     let lines =
         input
@@ -73,10 +79,7 @@ let solveA input =
         |> List.map getAllCoordsOnLine
         |> List.concat
     let field = markVentsOnField allVents
-    field
-    |> Map.values
-    |> Seq.filter (fun v -> v > 1)
-    |> Seq.length
+    countOverlappingVents field
 
 let solveB input =
     let lines =
@@ -88,7 +91,4 @@ let solveB input =
         |> List.map getAllCoordsOnLine
         |> List.concat
     let field = markVentsOnField allVents
-    field
-    |> Map.values
-    |> Seq.filter (fun v -> v > 1)
-    |> Seq.length
+    countOverlappingVents field
