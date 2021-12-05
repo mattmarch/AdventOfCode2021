@@ -24,12 +24,12 @@ let parseCoord coordString: Coord =
 let parseLines line: Line =
     line
     |> splitBy " -> "
-    |>List.map parseCoord
+    |> List.map parseCoord
     |> unpack2
     
 let isHorizontalOrVertical (lineStart, lineEnd) =
     lineStart.X = lineEnd.X || lineStart.Y = lineEnd.Y
-    
+
 let getCoordAlongLine start direction distance =
     {
         X = start.X + (distance * direction.X)
@@ -42,8 +42,8 @@ let getDirection1d fromPoint toPoint =
     | fromPoint, toPoint when toPoint < fromPoint -> -1
     | _ -> 0
 
-let getAllPointsOnLine (lineStart, lineEnd) =
-    let numberOfPoints = 1 + List.max([
+let getAllCoordsOnLine (lineStart, lineEnd) =
+    let numberOfCoords = 1 + List.max([
         abs (lineEnd.X - lineStart.X)
         abs (lineEnd.Y - lineStart.Y)
     ])
@@ -51,29 +51,28 @@ let getAllPointsOnLine (lineStart, lineEnd) =
         X = getDirection1d lineStart.X lineEnd.X
         Y = getDirection1d lineStart.Y lineEnd.Y
     }
-    List.init numberOfPoints (getCoordAlongLine lineStart direction)
+    List.init numberOfCoords (getCoordAlongLine lineStart direction)
 
-let markPointOnField (field: Field) (point: Coord) =
+let markVentOnField (field: Field) (point: Coord) =
     match field |> Map.tryFind point with
-    | Some existingCrossings -> field.Add (point, existingCrossings + 1)
+    | Some existingVents -> field.Add (point, existingVents + 1)
     | None -> field.Add (point, 1)
 
-let emptyField: Field = Map.ofList []
-    
-let markPointsOnField points =
-    points |> List.fold markPointOnField emptyField
-    
+let markVentsOnField points =
+    let emptyField: Field = Map.ofList []
+    points |> List.fold markVentOnField emptyField
+
 let solveA input =
     let lines =
         input
         |> Seq.map parseLines
         |> Seq.toList
-    let allPoints =
+    let allVents =
         lines
         |> List.filter isHorizontalOrVertical
-        |> List.map getAllPointsOnLine
+        |> List.map getAllCoordsOnLine
         |> List.concat
-    let field = markPointsOnField allPoints
+    let field = markVentsOnField allVents
     field
     |> Map.values
     |> Seq.filter (fun v -> v > 1)
@@ -84,11 +83,11 @@ let solveB input =
         input
         |> Seq.map parseLines
         |> Seq.toList
-    let allPoints =
+    let allVents =
         lines
-        |> List.map getAllPointsOnLine
+        |> List.map getAllCoordsOnLine
         |> List.concat
-    let field = markPointsOnField allPoints
+    let field = markVentsOnField allVents
     field
     |> Map.values
     |> Seq.filter (fun v -> v > 1)
