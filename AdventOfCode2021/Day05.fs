@@ -27,50 +27,68 @@ let parseLines line: Line =
     |>List.map parseCoord
     |> unpack2
     
-let isHorizontal (lineStart, lineEnd) =
-    lineStart.Y = lineEnd.Y
+let isHorizontalOrVertical (lineStart, lineEnd) =
+    lineStart.X = lineEnd.X || lineStart.Y = lineEnd.Y
     
-let isVertical (lineStart, lineEnd) =
-    lineStart.X = lineEnd.X
-    
-let pointsInRange rangeStart rangeEnd =
-    let numberOfPoints = abs (rangeEnd - rangeStart) + 1
-    let incrementDirection = if rangeEnd > rangeStart then 1 else -1
-    List.init numberOfPoints (fun i -> rangeStart + (i * incrementDirection))
+let getCoordAlongLine start direction distance =
+    {
+        X = start.X + (distance * direction.X)
+        Y = start.Y + (distance * direction.Y)
+    }
 
-let getAllHorizontalPoints (lineStart, lineEnd) =
-    pointsInRange lineStart.X lineEnd.X
-    |> List.map (fun x -> { X = x; Y = lineStart.Y })
-    
-let getAllVerticalPoints (lineStart, lineEnd) =
-    pointsInRange lineStart.Y lineEnd.Y
-    |> List.map (fun y -> { X = lineStart.X; Y = y })
+let getDirection1d fromPoint toPoint =
+    match fromPoint, toPoint with
+    | fromPoint, toPoint when toPoint > fromPoint -> 1
+    | fromPoint, toPoint when toPoint < fromPoint -> -1
+    | _ -> 0
+
+let getAllPointsOnLine (lineStart, lineEnd) =
+    let numberOfPoints = 1 + List.max([
+        abs (lineEnd.X - lineStart.X)
+        abs (lineEnd.Y - lineStart.Y)
+    ])
+    let direction = {
+        X = getDirection1d lineStart.X lineEnd.X
+        Y = getDirection1d lineStart.Y lineEnd.Y
+    }
+    List.init numberOfPoints (getCoordAlongLine lineStart direction)
 
 let markPointOnField (field: Field) (point: Coord) =
     match field |> Map.tryFind point with
     | Some existingCrossings -> field.Add (point, existingCrossings + 1)
     | None -> field.Add (point, 1)
+
+let emptyField: Field = Map.ofList []
     
-let markPointsOnField field points =
-    points |> List.fold markPointOnField field
+let markPointsOnField points =
+    points |> List.fold markPointOnField emptyField
     
 let solveA input =
     let lines =
         input
         |> Seq.map parseLines
         |> Seq.toList
-    let pointsFromHorizontalLines =
+    let allPoints =
         lines
-        |> List.filter isHorizontal
-        |> List.map getAllHorizontalPoints
+        |> List.filter isHorizontalOrVertical
+        |> List.map getAllPointsOnLine
         |> List.concat
-    let pointsFromVerticalLines =
+    let field = markPointsOnField allPoints
+    field
+    |> Map.values
+    |> Seq.filter (fun v -> v > 1)
+    |> Seq.length
+
+let solveB input =
+    let lines =
+        input
+        |> Seq.map parseLines
+        |> Seq.toList
+    let allPoints =
         lines
-        |> List.filter isVertical
-        |> List.map getAllVerticalPoints
+        |> List.map getAllPointsOnLine
         |> List.concat
-    let allPoints = List.concat [pointsFromHorizontalLines; pointsFromVerticalLines]
-    let field = markPointsOnField (Map.ofList []) allPoints
+    let field = markPointsOnField allPoints
     field
     |> Map.values
     |> Seq.filter (fun v -> v > 1)
