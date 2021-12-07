@@ -7,6 +7,8 @@ let readLines path: string seq = File.ReadLines path
 
 let readAll path = File.ReadAllText(path)
 
+let readSingleLine = readLines >> Seq.head
+
 let splitBy (separator: string) (inputString: string): string list = 
     inputString.Split([|separator|], StringSplitOptions.None) |> Array.toList
 

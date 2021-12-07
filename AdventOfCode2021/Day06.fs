@@ -2,7 +2,7 @@ module Day06
 
 open Common
 
-let getInput () = readLines "Inputs/06.txt" |> Seq.head
+let getInput () = readSingleLine "Inputs/06.txt"
 
 let initialState = List.init 9 (fun _ -> 0L)
 
@@ -17,27 +17,9 @@ let parseInput input =
     |> List.fold incrementFishCount initialState
     
 let runStep previousState =
-    let newBirths = previousState |> List.item 0
-    [
-        // 0
-        previousState |> List.item 1
-        // 1
-        previousState |> List.item 2
-        // 2
-        previousState |> List.item 3
-        // 3
-        previousState |> List.item 4
-        // 4
-        previousState |> List.item 5
-        // 5
-        previousState |> List.item 6
-        // 6
-        newBirths + (previousState |> List.item 7)
-        // 7
-        previousState |> List.item 8
-        // 8
-        newBirths
-    ]
+    match previousState with
+    | [p0; p1; p2; p3; p4; p5; p6; p7; p8] -> [p1; p2; p3; p4; p5; p6; p7 + p0; p8; p0]
+    | _ -> failwithf $"Expected previous state to consist of exactly 8 values, instead got %i{List.length previousState}: %A{previousState}"
 
 let rec runSteps numSteps startState =
     let nextState = runStep startState

@@ -5,7 +5,7 @@ open Xunit
 open Common
 open Day06
 
-let getInput () = readLines "TestInputs/06.txt" |> Seq.head
+let getInput () = readSingleLine "TestInputs/06.txt"
 
 [<Fact>]
 let ``Day06 Part A`` () =
