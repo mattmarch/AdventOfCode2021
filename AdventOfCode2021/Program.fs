@@ -8,3 +8,4 @@ printDay 3 Day03.solveA Day03.solveB Day03.getInput
 printDay 4 Day04.solveA Day04.solveB Day04.getInput
 printDay 5 Day05.solveA Day05.solveB Day05.getInput
 printDay 6 Day06.solveA Day06.solveB Day06.getInput
+printDay 7 Day07.solveA Day07.solveB Day07.getInput
