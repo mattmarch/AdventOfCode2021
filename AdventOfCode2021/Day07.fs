@@ -10,6 +10,7 @@ let parseInput input =
     |> List.map int
         
 let distanceFrom a b = abs (b - a)
+
 let solveA input =
     let positions = parseInput input
     let totalCrabs = List.length positions
@@ -29,8 +30,6 @@ let calculateTotalFuelToTarget positions target =
 
 let solveB input =
     let positions = parseInput input
-    let farthestCrab = List.max positions
-    let possibleSolutions = Seq.init (farthestCrab + 1) id
-    possibleSolutions
+    [ (List.min positions) .. (List.max positions) ]
     |> Seq.map (calculateTotalFuelToTarget positions)
     |> Seq.min
