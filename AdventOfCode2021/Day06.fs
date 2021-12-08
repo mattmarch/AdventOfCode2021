@@ -9,7 +9,7 @@ let incrementFishCount counters thisFish =
     counters |> List.updateAt thisFish (previousFishCount + 1L) 
 
 let parseInput input =
-    let zeroFishCounts = [ for _ in 0 .. 9 -> 0L ] 
+    let zeroFishCounts = [ for _ in 0 .. 8 -> 0L ] 
     input
     |> splitBy ","
     |> List.map int
@@ -18,7 +18,7 @@ let parseInput input =
 let runStep previousState =
     match previousState with
     | [p0; p1; p2; p3; p4; p5; p6; p7; p8] -> [p1; p2; p3; p4; p5; p6; p7 + p0; p8; p0]
-    | _ -> failwithf $"Expected previous state to consist of exactly 8 values, instead got %i{List.length previousState}: %A{previousState}"
+    | _ -> failwithf $"Expected previous state to consist of exactly 9 values, instead got %i{List.length previousState}: %A{previousState}"
 
 let rec runSteps numSteps startState =
     let nextState = runStep startState
