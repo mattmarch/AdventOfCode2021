@@ -47,28 +47,29 @@ let isInBasin heightmap coord =
     | Some _ -> true
     | None -> false
     
-let solveB input =
-    let heightmap = parseInput input
-    
-    let lowPoints =
-        heightmap
-        |> Map.keys
-        |> Seq.choose (lowPointChooser heightmap)
-        |> Seq.map fst
-    
-    let rec findAllInBasin alreadyFoundCoords coord =
+let findAllInBasin heightMap startingCoord =
+    let rec findNeighboursRecursively alreadyFoundCoords coord =
         let newNeighboursInBasin =
             coord
             |> getNeighbours
             |> List.filter (not << (fun c -> alreadyFoundCoords |> List.contains c))
-            |> List.filter (isInBasin heightmap)
+            |> List.filter (isInBasin heightMap)
         let updatedFoundCoords = alreadyFoundCoords @ newNeighboursInBasin
         newNeighboursInBasin
-        |> List.fold findAllInBasin updatedFoundCoords
+        |> List.fold findNeighboursRecursively updatedFoundCoords
+    findNeighboursRecursively [ startingCoord ] startingCoord
+    
+let solveB input =
+    let heightMap = parseInput input
+    let lowPoints =
+        heightMap
+        |> Map.keys
+        |> Seq.choose (lowPointChooser heightMap)
+        |> Seq.map fst
     
     lowPoints
-    |> Seq.map (fun p -> findAllInBasin [p] p)
-    |> Seq.map (List.length)
+    |> Seq.map (findAllInBasin heightMap)
+    |> Seq.map List.length
     |> Seq.sortDescending
     |> Seq.take 3
     |> Seq.reduce (*)
