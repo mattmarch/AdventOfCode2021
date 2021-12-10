@@ -14,6 +14,6 @@ let ``Day09 Part A`` () =
 
 
 [<Fact>]
-let ``Day08 Part B`` () =
+let ``Day09 Part B`` () =
     let testInput = getInput ()
     Assert.Equal(1134, (solveB testInput))

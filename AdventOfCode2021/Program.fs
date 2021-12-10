@@ -1,6 +1,12 @@
-﻿let printDay number solveA solveB getInput =
+﻿open System.Diagnostics
+
+let printDay number solveA solveB getInput =
+    let stopWatch = Stopwatch.StartNew()
     let input = getInput ()
-    printfn $"Day %i{number}, part A: %A{solveA input}, part B %A{solveB input}"
+    let partA = solveA input
+    let partB = solveB input
+    let elapsedMs = stopWatch.Elapsed.TotalMilliseconds
+    printfn $"Day %i{number}\t part 1 = %A{partA}\t part 2 = %A{partB}\t in %f{elapsedMs}ms"
 
 printDay 1 Day01.solveA Day01.solveB Day01.getInput
 printDay 2 Day02.solveA Day02.solveB Day02.getInput
@@ -11,3 +17,4 @@ printDay 6 Day06.solveA Day06.solveB Day06.getInput
 printDay 7 Day07.solveA Day07.solveB Day07.getInput
 printDay 8 Day08.solveA Day08.solveB Day08.getInput
 printDay 9 Day09.solveA Day09.solveB Day09.getInput
+printDay 10 Day10.solveA Day10.solveB Day10.getInput
