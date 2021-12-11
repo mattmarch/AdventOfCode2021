@@ -4,16 +4,18 @@ open Common
 
 let getInput () = readSingleLine "Inputs/06.txt"
 
-let incrementFishCount counters thisFish =
-    let previousFishCount = counters |> List.item thisFish
-    counters |> List.updateAt thisFish (previousFishCount + 1L) 
-
 let parseInput input =
-    let zeroFishCounts = [ for _ in 0 .. 8 -> 0L ] 
-    input
-    |> splitBy ","
-    |> List.map int
-    |> List.fold incrementFishCount zeroFishCounts
+    let fishCounts =
+        input
+        |> splitBy ","
+        |> List.groupBy id
+        |> List.map (fun (fishState, fishList) -> int fishState, List.length fishList |> int64)
+        |> Map.ofList
+    List.init 9 (fun i ->
+        match fishCounts |> Map.tryFind i with
+        | Some count -> count
+        | None -> 0L
+    )
 
 let runStep previousState =
     match previousState with

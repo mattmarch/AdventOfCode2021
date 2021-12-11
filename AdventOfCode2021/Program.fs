@@ -6,7 +6,7 @@ let printDay number solveA solveB getInput =
     let partA = solveA input
     let partB = solveB input
     let elapsedMs = stopWatch.Elapsed.TotalMilliseconds
-    printfn $"Day %i{number}\t part 1 = %A{partA}\t part 2 = %A{partB}\t in %f{elapsedMs}ms"
+    printfn $"Day %i{number}\t part 1 = %15O{partA}\t\t part 2 = %15O{partB}\t\t in %f{elapsedMs}ms"
 
 printDay 1 Day01.solveA Day01.solveB Day01.getInput
 printDay 2 Day02.solveA Day02.solveB Day02.getInput

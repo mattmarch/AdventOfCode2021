@@ -62,5 +62,5 @@ let solveB input =
         |> Seq.filter uncorruptedFilter
         |> Seq.map getLineCompletionScore
         |> Seq.sort
-    let middleValue = Seq.length autocompleteScores / 2
-    autocompleteScores |> Seq.item middleValue
+    let middleIndex = Seq.length autocompleteScores / 2
+    autocompleteScores |> Seq.item middleIndex
