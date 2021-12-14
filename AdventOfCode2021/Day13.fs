@@ -69,7 +69,7 @@ let getLineForPrinting maxX points yCoord =
         points
         |> List.filter (fun (_, y) -> y = yCoord)
         |> List.map fst
-    List.init (maxX + 1) (fun x -> if xCoordsOnLine |> List.contains x then "#" else " ")
+    List.init (maxX + 1) (fun x -> if xCoordsOnLine |> List.contains x then "█" else " ")
     |> String.concat ""
     
 let solveB input =
