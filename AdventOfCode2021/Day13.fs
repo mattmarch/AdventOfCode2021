@@ -1,6 +1,5 @@
 module Day13
 
-open System
 open Common
 
 type Fold =

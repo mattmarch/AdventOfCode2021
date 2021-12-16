@@ -1,6 +1,5 @@
 module Day14
 
-open System
 open Common
 
 let getInput () = readLines "Inputs/14.txt"
@@ -79,6 +78,5 @@ let solveB input =
         |> List.map (fun ((a,b), count) -> [ a, count; b, count ])
         |> List.concat
         |> deduplicateCounts
-        |> List.map (fun (element, count) -> element, (count + 1L) / 2L)
-    let allCounts = elementCounts |> List.map snd
-    List.max allCounts - List.min allCounts
+        |> List.map (fun (_, count) -> (count + 1L) / 2L)
+    List.max elementCounts - List.min elementCounts
