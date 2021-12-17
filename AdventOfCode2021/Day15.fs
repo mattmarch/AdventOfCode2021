@@ -2,18 +2,9 @@ module Day15
 
 open Common
 
-type Location = {
-    RiskLevel: int
-    CumulativeRiskLevel: int option
-    Checked: bool
-}
-
-type Cavern = Map<int*int, Location>
-
 let getInput () = readLines "Inputs/15.txt"
 
-let parseCharacter c =
-    { RiskLevel = c |> string |> int; CumulativeRiskLevel = None; Checked = false }
+let parseCharacter: char -> int = string >> int
 
 let parseLine yIndex line =
     line
@@ -27,89 +18,69 @@ let parseAll input =
     |> Seq.concat
     |> Map.ofSeq
 
-let updateLocation coord (updater: Location -> Location) (cavern: Cavern) =
-    cavern
-    |> Map.change coord (fun prevLocation ->
-        match prevLocation with
-        | Some location -> Some (updater location)
-        | None -> failwithf $"Can't update location %A{coord} which doesn't exist"
-        )
-
-
-let updateCumulativeRisk coord newRiskLevel (cavern: Cavern) =
-    cavern
-    |> updateLocation coord (fun c -> { c with CumulativeRiskLevel = Some newRiskLevel })
-    
-let markLocationChecked coord cavern =
-    cavern
-    |> updateLocation coord (fun c -> { c with Checked = true })
-
 let getNeighbours (x, y) = [ x-1, y; x+1, y; x, y-1; x, y+1 ]
 
-let updateLocationIfShorter currentCumulative (cavern: Cavern) coord =
-    match cavern |> Map.tryFind coord with
-    | None -> cavern
-    | Some location ->
-        let newRiskLevel = location.RiskLevel + currentCumulative
-        match location.CumulativeRiskLevel with
-        | Some previousRiskLevel when previousRiskLevel <= newRiskLevel -> cavern
-        | _ -> updateCumulativeRisk coord newRiskLevel cavern
+let setValue (x,y) value array =
+    Array2D.set array x y (Some value)
 
-let rec traverseCavern target (cavern: Cavern) =
-    let nextPositionsToCheck =
-        cavern
-        |> Map.toList
-        |> List.filter (fun (_, l) -> not l.Checked && l.CumulativeRiskLevel.IsSome)
-        |> List.sortBy (fun (_, l) -> l.CumulativeRiskLevel)
-        |> List.tryHead
-    match nextPositionsToCheck with
-    | None -> failwithf "Ran out of paths to check before reaching target"
-    | Some (nextCoord, nextLocationInfo) when nextCoord = target -> nextLocationInfo.CumulativeRiskLevel.Value
-    | Some (nextCoord, nextLocationInfo) ->
-        let updatedCavern =
-            nextCoord
-            |> getNeighbours
-            |> List.fold (updateLocationIfShorter nextLocationInfo.CumulativeRiskLevel.Value) cavern
-            |> markLocationChecked nextCoord
-        traverseCavern target updatedCavern
+let getValue (x,y) array =
+    Array2D.get array x y
 
+let traverseCavern (cavern: Map<int*int, int>) =
+    let maxX, maxY = cavern |> Map.keys |> Seq.maxBy (fun (x,y) -> x + y)
+    let startPoint = (0, 0)
+    let cavernTotals =
+        array2D (Array.init (maxY+1) (fun _ -> Array.create (maxX+1) None))
+    cavernTotals |> setValue startPoint 0
+    let recentlyPopulatedCoords = [startPoint, 0]
+    let rec traverseNextSteps recentlyPopulated =
+        let nextCoord, value = recentlyPopulated |> List.minBy snd
+        if nextCoord = (maxX, maxY) then
+            value
+        else
+            let neighbours =
+                nextCoord
+                |> getNeighbours
+                |> List.choose (fun coord ->
+                    match cavern |> Map.tryFind coord with
+                    | None -> None
+                    | Some cavernValue ->
+                        match cavernTotals |> getValue coord with
+                        | Some previousValue when previousValue > (cavernValue + value) -> Some (coord, cavernValue + value)
+                        | None -> Some (coord, cavernValue + value)
+                        | _ -> None
+                    )
+            neighbours |> List.iter (fun (coord, v) -> cavernTotals |> setValue coord v)
+            let newRecentlyPopulated =
+                (recentlyPopulated |> List.filter (fun (c, _) -> c <> nextCoord)) @ neighbours
+            traverseNextSteps newRecentlyPopulated
+    traverseNextSteps recentlyPopulatedCoords
+            
 let solveA input =
-    let initialCavern =
+    let cavern =
         parseAll input
-        |> updateCumulativeRisk (0,0) 0
-    let target =
-        initialCavern
-        |> Map.keys
-        |> Seq.maxBy (fun (x,y) -> x + y)
-    initialCavern
-    |> traverseCavern target
+    traverseCavern cavern
 
 let incrementAndWrapRiskLevel v inc = (v + inc - 1) % 9 + 1
 
 let createLargeCavern smallCavern =
     let smallCavernItems = smallCavern |> Map.toList
-    let (xMax, yMax), _ = smallCavernItems |> List.maxBy (fun ((x,y), _) -> x + y)
+    let xMax, yMax = smallCavernItems |> List.map fst |> List.maxBy (fun (x,y) -> x + y)
     let cavernXStretched =
         List.init 5 (fun i ->
             smallCavernItems
-            |> List.map (fun ((x,y), loc) -> (x + i*(xMax+1), y), { loc with RiskLevel = incrementAndWrapRiskLevel loc.RiskLevel i })
+            |> List.map (fun ((x,y), v) -> (x + i*(xMax + 1), y), incrementAndWrapRiskLevel v i)
             )
         |> List.concat
     List.init 5 (fun i ->
         cavernXStretched
-        |> List.map (fun ((x,y), loc) -> (x, y + i*(yMax+1)), { loc with RiskLevel = incrementAndWrapRiskLevel loc.RiskLevel i })
+        |> List.map (fun ((x,y), v) -> (x, y + i*(yMax+1)), incrementAndWrapRiskLevel v i)
         )
     |> List.concat
     |> Map.ofList
 
-let solveB input =
-    let initialCavern =
+let solveB input = 
+    let cavern =
         parseAll input
         |> createLargeCavern
-        |> updateCumulativeRisk (0,0) 0
-    let target =
-        initialCavern
-        |> Map.keys
-        |> Seq.maxBy (fun (x,y) -> x + y)
-    initialCavern
-    |> traverseCavern target
+    traverseCavern cavern
