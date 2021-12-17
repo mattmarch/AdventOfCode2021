@@ -24,3 +24,4 @@ printDay 13 Day13.solveA Day13.solveB Day13.getInput
 printDay 14 Day14.solveA Day14.solveB Day14.getInput
 //printDay 15 Day15.solveA Day15.solveB Day15.getInput
 printDay 16 Day16.solveA Day16.solveB Day16.getInput
+printDay 17 Day17.solveA Day17.solveB Day17.getInput
