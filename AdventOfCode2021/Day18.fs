@@ -91,12 +91,6 @@ let solveA input =
     |> Seq.map parseSnailFishNumber
     |> Seq.reduce addSnailFishNumbers
     |> getSnailFishNumberMagnitude
-    
-let allCombinations l =
-    let indexedL = List.indexed l
-    List.allPairs indexedL indexedL
-    |> List.filter (fun ((i1, _), (i2, _)) -> i1 <> i2)
-    |> List.map (fun ((_, n1), (_, n2)) -> n1, n2)
 
 let solveB input =
     input
