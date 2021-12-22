@@ -5,14 +5,16 @@ open Xunit
 open Common
 open Day22
 
-let getInput () = readLines "TestInputs/22.txt"
+let getInputA () = readLines "TestInputs/22a.txt"
+let getInputB () = readLines "TestInputs/22b.txt"
+
 
 [<Fact>]
 let ``Day22 Part A`` () =
-    let testInput = getInput ()
+    let testInput = getInputA ()
     Assert.Equal(590784L, (solveA testInput))
     
 [<Fact>]
 let ``Day22 Part B`` () =
-    let testInput = getInput ()
-    Assert.Equal(444356092776315L, (solveB testInput))
+    let testInput = getInputB ()
+    Assert.Equal(2758514936282235L, (solveB testInput))
