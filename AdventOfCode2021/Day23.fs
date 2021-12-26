@@ -1,5 +1,6 @@
 module Day23
 
+open System.Collections.Generic
 open Common
 
 type Amphipod = A | B | C | D
@@ -171,38 +172,55 @@ let isSolved state =
     |> List.forall (fun (i, room) ->
         isRoomComplete room (roomNumberToTargetAmphipod i))
 
-let rec solveNextSteps startingState =
-    let stateAfterMovingIntoRooms = applyAllMovesIntoRooms startingState
-    if isSolved stateAfterMovingIntoRooms then
-        Some stateAfterMovingIntoRooms.EnergyExpended
-    else
-        let nextPossibleSteps = getPossibleMovesIntoCorridor stateAfterMovingIntoRooms
-        match nextPossibleSteps with
-        | [] -> None
-        | nextSteps -> nextSteps |> (solveForStates None)
-
-and solveForStates (minimumSoFar: int option) states =
-    match states with
-    | [] -> minimumSoFar
-    | nextStateToTry :: remaining ->
-        let nextMinimum =
-            match solveNextSteps nextStateToTry, minimumSoFar with
-            | Some result, Some previousMinimum -> List.min [ result; previousMinimum ] |> Some
-            | Some result, None -> Some result
-            | None, Some previousMinimum -> Some previousMinimum
-            | None, None -> None
-        solveForStates nextMinimum remaining
+let solve initialState =
+    let cache = Dictionary<State, int option>()
+    let rec solveStepsCached state =
+        match cache.TryGetValue state with
+        | true, v -> v
+        | false, _ ->
+            let v = solveNextSteps state
+            cache.Add (state, v)
+            v
+    and solveNextSteps startingState =
+        let stateAfterMovingIntoRooms = applyAllMovesIntoRooms startingState
+        if isSolved stateAfterMovingIntoRooms then
+            Some stateAfterMovingIntoRooms.EnergyExpended
+        else
+            let nextPossibleSteps = getPossibleMovesIntoCorridor stateAfterMovingIntoRooms
+            match nextPossibleSteps |> List.choose solveStepsCached with
+            | [] -> None
+            | nextStates -> nextStates |> List.min |> Some
+    solveNextSteps initialState
 
 let solveA input =
     let rooms = parseInput input
-    let corridor = List.replicate 9 None
+    let corridor = List.replicate 11 None
     let initialState = {
         Rooms = rooms
         Corridor = corridor
         EnergyExpended = 0
     }
-    match solveNextSteps initialState with
+    match solve initialState with
     | Some result -> result
     | None -> failwithf "No result found!"
 
-let solveB input = 5
+
+let insertMissingIntoRooms (rooms: Space list list) =
+    let missingValues = [ [ D; D ]; [ C; B ]; [ B; A ]; [ A; C ] ] |> List.map (List.map Some)
+    rooms
+    |> List.mapi (fun i room -> room |> List.insertManyAt 1 missingValues.[i])
+
+let solveB input =
+    let rooms =
+        input
+        |> parseInput
+        |> insertMissingIntoRooms
+    let corridor = List.replicate 11 None
+    let initialState = {
+        Rooms = rooms
+        Corridor = corridor
+        EnergyExpended = 0
+    }
+    match solve initialState with
+    | Some result -> result
+    | None -> failwithf "No result found!"

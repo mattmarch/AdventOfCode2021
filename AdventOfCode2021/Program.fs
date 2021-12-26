@@ -46,5 +46,6 @@ let main argv =
     printDay 20 Day20.solveA Day20.solveB Day20.getInput
     printDay 21 Day21.solveA Day21.solveB Day21.getInput
     printDay 22 Day22.solveA Day22.solveB Day22.getInput
+    printDay 23 Day23.solveA Day23.solveB Day23.getInput
     
     0 
